@@ -1,0 +1,39 @@
+version: "3.8"
+
+networks:
+  mern:
+    driver: bridge
+
+volumes:
+  mongo_data:
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"   # use 5173 for dev mode OR change to 3000:80 for prod mode
+    depends_on:
+      - backend
+    networks:
+      - mern
+
+  backend:
+    build: ./backend
+    ports:
+      - "5050:5050"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/employees
+    depends_on:
+      - mongo
+    networks:
+      - mern
+
+  mongo:
+    image: mongo:6.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - mern
